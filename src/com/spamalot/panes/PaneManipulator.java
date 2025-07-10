@@ -1,11 +1,10 @@
 package com.spamalot.panes;
 
-import java.util.EmptyStackException;
-import java.util.Stack;
-
 import com.spamalot.panes.exception.IllegalMoveException;
 import com.spamalot.panes.gui.CounterLabel;
 import com.spamalot.panes.gui.LogArea;
+import java.util.EmptyStackException;
+import java.util.Stack;
 
 /**
  * This is a Mediator class for the Panes game.

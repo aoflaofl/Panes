@@ -1,9 +1,8 @@
 package com.spamalot.panes;
 
-import java.awt.Color;
-
 import com.spamalot.panes.exception.IllegalAdditionException;
 import com.spamalot.panes.exception.IllegalSubtractionException;
+import java.awt.Color;
 
 /**
  * Handles all the color needs for a game of Panes. Since we are dealing with
@@ -25,12 +24,14 @@ final class PaneColor implements java.io.Serializable {
   /**
    * An array holding all the colors for easy iteration.
    */
-  static final PaneColor[] PALLET = { PaneColor.RED, PaneColor.BLUE, PaneColor.YELLOW, PaneColor.PURPLE, PaneColor.GREEN, PaneColor.ORANGE, };
+  static final PaneColor[] PALLET = { PaneColor.RED, PaneColor.BLUE, PaneColor.YELLOW, PaneColor.PURPLE,
+      PaneColor.GREEN, PaneColor.ORANGE, };
 
   /**
    * 
    */
   private static final long serialVersionUID = 1L;
+  private static final PaneColor WHITE = null;
 
   private boolean redC;
   private boolean blueC;
@@ -51,28 +52,24 @@ final class PaneColor implements java.io.Serializable {
   /**
    * Return the PaneColor that matches the colors passed in.
    * 
-   * @param redBit
-   *          True if the color has red in it.
-   * @param blueBit
-   *          True if the color has blue in it.
-   * @param yellowBit
-   *          True if the color has Yellow in it.
+   * @param redBit    True if the color has red in it.
+   * @param blueBit   True if the color has blue in it.
+   * @param yellowBit True if the color has Yellow in it.
    * @return a PaneColor object matching the arguments passed in.
    */
   private static PaneColor instance(final boolean redBit, final boolean blueBit, final boolean yellowBit) {
-    // TODO: Handle case where all bits are true.
-    if (redBit) {
-      if (blueBit) {
-        return PaneColor.PURPLE;
-      } else if (yellowBit) {
-        return PaneColor.ORANGE;
-      } else {
-        return PaneColor.RED;
-      }
+    // Handle all possible color combinations using a more direct approach
+    if (redBit && blueBit && yellowBit) {
+      return PaneColor.WHITE;
+    } else if (redBit && blueBit) {
+      return PaneColor.PURPLE;
+    } else if (redBit && yellowBit) {
+      return PaneColor.ORANGE;
+    } else if (blueBit && yellowBit) {
+      return PaneColor.GREEN;
+    } else if (redBit) {
+      return PaneColor.RED;
     } else if (blueBit) {
-      if (yellowBit) {
-        return PaneColor.GREEN;
-      }
       return PaneColor.BLUE;
     } else if (yellowBit) {
       return PaneColor.YELLOW;
@@ -83,7 +80,7 @@ final class PaneColor implements java.io.Serializable {
 
   @Override
   public String toString() {
-    StringBuffer s = new StringBuffer();
+    StringBuilder s = new StringBuilder();
     s.append("[ ");
     if (redC) {
       s.append("Red ");
@@ -127,14 +124,11 @@ final class PaneColor implements java.io.Serializable {
    * @return true if this color is a composite color (purple, orange, green).
    */
   private boolean isComposite() {
-    if (this == PaneColor.GREEN || this == PaneColor.ORANGE || this == PaneColor.PURPLE) {
-      return true;
-    }
-    return false;
+    return this == PaneColor.GREEN || this == PaneColor.ORANGE || this == PaneColor.PURPLE;
   }
 
   private boolean isPrimary() {
-    return !isComposite() && !(this == PaneColor.EMPTY);
+    return !isComposite() && this != PaneColor.EMPTY;
   }
 
   PaneColor minus(final PaneColor jumpColor) throws IllegalSubtractionException {
@@ -144,7 +138,9 @@ final class PaneColor implements java.io.Serializable {
       retVal = PaneColor.EMPTY;
 
     } else if (jumpColor.isPrimary()) {
-      boolean redBit = this.redC, blueBit = this.blueC, yellowBit = this.yellowC;
+      boolean redBit = this.redC;
+      boolean blueBit = this.blueC;
+      boolean yellowBit = this.yellowC;
       if (jumpColor.redC) {
         redBit = false;
       }
@@ -178,7 +174,6 @@ final class PaneColor implements java.io.Serializable {
       if (c.yellowC) {
         yellowBit = true;
       }
-      // this.value = this.realcolor();
       return PaneColor.instance(redBit, blueBit, yellowBit);
     } else {
       throw new IllegalAdditionException();
@@ -186,10 +181,7 @@ final class PaneColor implements java.io.Serializable {
   }
 
   private boolean has(final PaneColor c) {
-    if ((redC && c.redC) || (blueC && c.blueC) || (yellowC && c.yellowC)) {
-      return true;
-    }
-    return false;
+    return ((redC && c.redC) || (blueC && c.blueC) || (yellowC && c.yellowC));
   }
 
   int count() {
@@ -215,10 +207,7 @@ final class PaneColor implements java.io.Serializable {
     if (!p.isComposite()) {
       return true;
     }
-    if (p.has(this)) {
-      return true;
-    }
-    return false;
+    return (p.has(this));
   }
 
   boolean canLand(final PaneColor p) {
@@ -228,37 +217,6 @@ final class PaneColor implements java.io.Serializable {
     if (p == PaneColor.EMPTY) {
       return true;
     }
-    if (!this.isComposite() && !p.isComposite()) {
-      return true;
-    }
-    return false;
+    return (!this.isComposite() && !p.isComposite());
   }
-
-  /*
-   * public static void main(final String[] arg) { System.out.println("Testing
-   * has()..."); for (int i = 0; i < 6; i++) { for (int j = 0; j < 6; j++) {
-   * System.out.println(new StringBuffer(PaneColor.PALLET[i]
-   * .toString()).append(" has ").append(
-   * PaneColor.PALLET[j].toString()).append(" = ").append(
-   * PaneColor.PALLET[i].has(PaneColor.PALLET[j]))); } } }
-   */
-  // TODO Remove unused code found by UCDetector
-  // /**
-  // * A general function to test legality of a move.
-  // *
-  // * @param jumper
-  // * The color doing the jumping.
-  // * @param middle
-  // * The color being jumped.
-  // * @param target
-  // * The square being landed on.
-  // * @return true if the colors passed in represent a legal move, false
-  // * otherwise.
-  // * @deprecated
-  // */
-  // @Deprecated
-  // public static boolean isLegal(final PaneColor jumper,
-  // final PaneColor middle, final PaneColor target) {
-  // return jumper.canJump(middle) && jumper.canLand(target);
-  // }
 }

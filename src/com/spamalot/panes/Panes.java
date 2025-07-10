@@ -1,16 +1,14 @@
 package com.spamalot.panes;
 
+import com.spamalot.panes.gui.LogArea;
+import com.spamalot.panes.gui.PanesFrame;
+import com.spamalot.panes.gui.PanesMenu;
 import java.awt.Container;
-
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
-
-import com.spamalot.panes.gui.LogArea;
-import com.spamalot.panes.gui.PanesFrame;
-import com.spamalot.panes.gui.PanesMenu;
 
 /*
  * TODO: Sound

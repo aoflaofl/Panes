@@ -5,28 +5,20 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.Hashtable;
-import java.util.Vector;
-
+import java.util.ArrayList;
+import java.util.HashMap;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.border.EtchedBorder;
 
-/**
- * @author gej
- * 
- */
 class Pane extends JPanel implements MouseListener {
 
-  /**
-   * 
-   */
   private static final long serialVersionUID = 1L;
   private PaneColor color;
-  private boolean mark;
+  private boolean mark = false;
 
-  private Vector<Pane> targets = new Vector<Pane>();
-  private Hashtable<Pane, Pane> middles = new Hashtable<Pane, Pane>();
+  private ArrayList<Pane> targets = new ArrayList<>();
+  private HashMap<Pane, Pane> middles = new HashMap<>();
 
   Pane(final PaneColor clr) {
     this.color = clr;
@@ -67,23 +59,22 @@ class Pane extends JPanel implements MouseListener {
 
   @Override
   public void mouseEntered(final MouseEvent e) { // Event not used.
-    // setMoveHints(true);
   }
 
   @Override
   public void mouseExited(final MouseEvent e) { // Event not used.
-    // setMoveHints(false);
   }
 
   @Override
-  public final void paint(final Graphics g) {
-
+  protected void paintComponent(final Graphics g) {
+    super.paintComponent(g);
     g.setColor(color.value());
     g.fillRect(0, 0, Constants.PANE_X_SIZE, Constants.PANE_Y_SIZE);
     if (mark) {
       g.setColor(Color.WHITE);
-      g.fillOval((Constants.PANE_X_SIZE - Constants.MOVE_HINT_CIRCLE_SIZE) / 2, (Constants.PANE_Y_SIZE - Constants.MOVE_HINT_CIRCLE_SIZE) / 2,
-          Constants.MOVE_HINT_CIRCLE_SIZE, Constants.MOVE_HINT_CIRCLE_SIZE);
+      g.fillOval((Constants.PANE_X_SIZE - Constants.MOVE_HINT_CIRCLE_SIZE) / 2,
+          (Constants.PANE_Y_SIZE - Constants.MOVE_HINT_CIRCLE_SIZE) / 2, Constants.MOVE_HINT_CIRCLE_SIZE,
+          Constants.MOVE_HINT_CIRCLE_SIZE);
     }
   }
 
@@ -93,16 +84,15 @@ class Pane extends JPanel implements MouseListener {
    * this method. Therefore, after all the swaps are done, all Panes should have
    * their apply method called.
    * 
-   * @param p
-   *          The pane to swap with.
+   * @param p The pane to swap with.
    * @see PaneGrid#scrambleBoard()
    * @see #apply()
    */
 
-  final void swapWith(final Pane p) {
-    PaneColor tmp = p.color;
-    p.color = color;
-    color = tmp;
+  final void swapWith(Pane p) {
+    PaneColor tmp = p.getColor();
+    p.setColor(color);
+    setColor(tmp);
   }
 
   /**
@@ -132,8 +122,8 @@ class Pane extends JPanel implements MouseListener {
         Pane target = b.getPane(targetX, targetY);
 
         /*
-         * target will only be null if it's not on the board if the registering
-         * is done after the PaneGrid has been filled with Panes.
+         * target will only be null if it's not on the board if the registering is done
+         * after the PaneGrid has been filled with Panes.
          */
         if (target != null) {
           targets.add(target);
@@ -151,8 +141,7 @@ class Pane extends JPanel implements MouseListener {
   /**
    * Checks if this Pane can jump to a target Pane.
    * 
-   * @param target
-   *          The Pane being jumped to
+   * @param target The Pane being jumped to
    * @return true if this Pane can jump to target Pane.
    */
   final boolean canJumpTo(final Pane target) {
