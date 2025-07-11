@@ -7,18 +7,10 @@ import java.awt.Container;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-/*
- * TODO: Sound
- * TODO: Hints - Suggest a move
- * TODO: Resize Panes
- * TODO: Clean up GUI - Borders, Colors
- * TODO: JPGs for Panes
- * TODO: Image Buttons
- * TODO: Support Depth First Search
- */
 /**
  * Panes - A game of world domination. No, really just a puzzle game.
  * 
@@ -27,51 +19,95 @@ import javax.swing.UnsupportedLookAndFeelException;
  */
 final class Panes {
 
-  private Panes() {
+	private Panes() {
+	}
 
-  }
+	public static void main(final String[] arg) {
+		init();
+	}
 
-  public static void main(final String[] arg) {
+	/**
+	 * Initializes the application by setting up the look and feel, creating the
+	 * main frame, and initializing the game logic.
+	 */
+	static void init() {
+		try {
+			setLookAndFeel();
+			JFrame frame = createMainFrame();
+			addComponents(frame);
+			frame.setVisible(true);
+			PaneManipulator.init();
+		} catch (Exception e) {
+			showErrorDialog("Failed to initialize Panes application.", e);
+		}
+	}
 
-    init();
-  }
+	/**
+	 * Sets the system look and feel for the application.
+	 * 
+	 * @throws ClassNotFoundException          if the look and feel class is not
+	 *                                         found
+	 * @throws InstantiationException          if the look and feel cannot be
+	 *                                         instantiated
+	 * @throws IllegalAccessException          if the look and feel cannot be
+	 *                                         accessed
+	 * @throws UnsupportedLookAndFeelException if the look and feel is not supported
+	 */
+	private static void setLookAndFeel() throws ClassNotFoundException, InstantiationException, IllegalAccessException,
+			UnsupportedLookAndFeelException {
+		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		// Optionally, use a different look and feel:
+		// UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+	}
 
-  static void init() {
+	/**
+	 * Creates and configures the main application frame.
+	 * 
+	 * @return the configured JFrame
+	 */
+	private static JFrame createMainFrame() {
+		JFrame frame = new JFrame("Panes");
+		frame.setSize(Constants.FRAME_WIDTH, Constants.FRAME_HEIGHT);
+		frame.setJMenuBar(PanesMenu.makeMenuBar());
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		return frame;
+	}
 
-    try {
-      JFrame f;
+	/**
+	 * Adds UI components to the main frame.
+	 * 
+	 * @param frame the main application frame
+	 */
+	private static void addComponents(JFrame frame) {
+		Container cp = frame.getContentPane();
+		cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
 
-      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		cp.add(Box.createVerticalGlue());
 
-//      UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+		final PanesFrame panesFrame = new PanesFrame();
+		cp.add(panesFrame);
+		cp.add(Box.createVerticalGlue());
 
-      f = new JFrame("Panes");
-      f.setSize(Constants.FRAME_WIDTH, Constants.FRAME_HEIGHT);
+		LogArea textarea = new LogArea();
+		PaneManipulator.setLogArea(textarea);
 
-      Container cp = f.getContentPane();
-      cp.setLayout(new BoxLayout(cp, BoxLayout.Y_AXIS));
+		if (Constants.DEBUG) {
+			cp.add(textarea);
+			cp.add(Box.createVerticalGlue());
+		}
 
-      cp.add(Box.createVerticalGlue());
+		frame.pack();
+	}
 
-      final PanesFrame b = new PanesFrame();
-      cp.add(b);
-      cp.add(Box.createVerticalGlue());
-      LogArea textarea = new LogArea();
-      PaneManipulator.setLogArea(textarea);
-
-      if (Constants.DEBUG) {
-        cp.add(textarea);
-        cp.add(Box.createVerticalGlue());
-      }
-      f.setJMenuBar(PanesMenu.makeMenuBar());
-
-      f.pack();
-
-      f.setVisible(true);
-      PaneManipulator.init();
-    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
-        | UnsupportedLookAndFeelException e) {
-      e.printStackTrace();
-    }
-  }
+	/**
+	 * Shows a user-friendly error dialog when initialization fails.
+	 * 
+	 * @param message the error message to display
+	 * @param e       the exception that was thrown
+	 */
+	private static void showErrorDialog(String message, Exception e) {
+		JOptionPane.showMessageDialog(null, message + "\n" + e.getMessage(), "Initialization Error",
+				JOptionPane.ERROR_MESSAGE);
+		e.printStackTrace();
+	}
 }
