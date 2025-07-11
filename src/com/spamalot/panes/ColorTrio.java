@@ -16,7 +16,8 @@ class ColorTrio {
   private final PaneColor middleColor;
   private final PaneColor targetColor;
 
-  private ColorTrio(final PaneColor jumper, final PaneColor jumpee, final PaneColor target) {
+  private ColorTrio(final PaneColor jumper, final PaneColor jumpee,
+      final PaneColor target) {
     jumperColor = jumper;
     middleColor = jumpee;
     targetColor = target;
@@ -81,7 +82,8 @@ class ColorTrio {
   final ColorTrio constructAfter() throws IllegalMoveException {
     ColorTrio result = null;
     try {
-      result = new ColorTrio(PaneColor.EMPTY, middleColor.minus(jumperColor), targetColor.plus(jumperColor));
+      result = new ColorTrio(PaneColor.EMPTY, middleColor.minus(jumperColor),
+          targetColor.plus(jumperColor));
     } catch (IllegalSubtractionException e) {
       throw new IllegalMoveException();
     } catch (IllegalAdditionException e) {

@@ -1,8 +1,7 @@
 package com.spamalot.panes.gui;
 
-import java.awt.TextArea;
-
 import com.spamalot.panes.Constants;
+import java.awt.TextArea;
 
 /**
  * The logging area that is displayed when debugging.

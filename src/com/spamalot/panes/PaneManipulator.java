@@ -3,8 +3,8 @@ package com.spamalot.panes;
 import com.spamalot.panes.exception.IllegalMoveException;
 import com.spamalot.panes.gui.CounterLabel;
 import com.spamalot.panes.gui.LogArea;
-import java.util.EmptyStackException;
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
  * This is a Mediator class for the Panes game.
@@ -16,8 +16,8 @@ public final class PaneManipulator {
   private static CounterLabel movesmadeLabel;
   private static LogArea textarea;
   private static Pane lifted;
-  private static Stack<Move> moves = new Stack<Move>();
-  private static Stack<Move> redo = new Stack<Move>();
+  private static Deque<Move> moves = new ArrayDeque<>();
+  private static Deque<Move> redo = new ArrayDeque<>();
 
   private static boolean moveHint = true;
 
@@ -102,33 +102,37 @@ public final class PaneManipulator {
 
   public static void takeBackMove() {
     log("Take Back\n");
-    try {
-      Move move = moves.pop();
-      board.takeBackMove(move);
-      redo.push(move);
-      remainingLabel.setCounter(board.getPaneCount());
-      movesmadeLabel.dec();
-    } catch (EmptyStackException e) {
+
+    if (moves.isEmpty()) {
       log(Messages.NO_MOVES_TO_TAKE_BACK);
+      return;
     }
+
+    Move move = moves.pop();
+    board.takeBackMove(move);
+    redo.push(move);
+    remainingLabel.setCounter(board.getPaneCount());
+    movesmadeLabel.dec();
   }
 
   public static void redoMove() {
     log("Redo\n");
-    try {
-      Move move = redo.pop();
-      board.redoMove(move);
-      moves.push(move);
-      remainingLabel.setCounter(board.getPaneCount());
-      movesmadeLabel.inc();
-    } catch (EmptyStackException e) {
+
+    if (redo.isEmpty()) {
       log(Messages.NO_MOVES_TO_REDO);
+      return;
     }
+
+    Move move = redo.pop();
+    board.redoMove(move);
+    moves.push(move);
+    remainingLabel.setCounter(board.getPaneCount());
+    movesmadeLabel.inc();
   }
 
   private static void pushMove(final Move move) {
     moves.push(move);
-    redo.removeAllElements();
+    redo.clear();
   }
 
   public static void newGame() {
@@ -136,8 +140,8 @@ public final class PaneManipulator {
     board.scrambleBoard(randomSeed);
     remainingLabel.setCounter(board.getPaneCount());
     movesmadeLabel.setCounter(0);
-    redo.removeAllElements();
-    moves.removeAllElements();
+    redo.clear();
+    moves.clear();
   }
 
   public static void exit() {
